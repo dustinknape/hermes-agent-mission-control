@@ -5,8 +5,8 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // DEV-ONLY local bypass (never active on Vercel preview/prod builds).
-  if (process.env.NODE_ENV === 'development') {
+  // DEV-ONLY local bypass (skip auth only on localhost).
+  if (process.env.NODE_ENV === 'development' && request.nextUrl.hostname === 'localhost') {
     return NextResponse.next();
   }
 
