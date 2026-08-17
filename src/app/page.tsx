@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Twitter, Youtube, ArrowUpRight, ArrowDownRight, ChevronRight } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Sparkline } from "@/components/sparkline";
@@ -446,6 +448,26 @@ function ScoreGauge({ score }: { score: ScoreData }) {
 
 // ── Main ──────────────────────────────────────────────────
 export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  // Show loading while checking auth
+  if (status === "loading") {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  // Don't render if not authenticated
+  if (!session) {
+    return null;
+  }
+
   const [data, setData] = useState<HomeData>(EMPTY);
   const [time, setTime] = useState(new Date());
   const [loaded, setLoaded] = useState(false);
